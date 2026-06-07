@@ -5,6 +5,9 @@ import dotenv from 'dotenv'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
+import authRoutes from './routes/auth.js'
+
+
 dotenv.config()
 
 const app = express()
@@ -16,12 +19,17 @@ app.use(cors({ origin: process.env.CLIENT_URL }))
 app.use(express.json())
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')))
 
+// Routes
+
+app.use('/api/auth', authRoutes)
+
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'SignVault API running' })
 })
 
-// Connect to MongoDB then start server
+// Connect MongoDB then start server
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('✅ MongoDB connected')
