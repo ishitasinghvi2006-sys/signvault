@@ -4,6 +4,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import docRoutes from './routes/docs.js'
 
 import authRoutes from './routes/auth.js'
 
@@ -22,7 +23,7 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')))
 // Routes
 
 app.use('/api/auth', authRoutes)
-
+app.use('/api/docs', docRoutes)
 
 // Health check
 app.get('/api/health', (req, res) => {
