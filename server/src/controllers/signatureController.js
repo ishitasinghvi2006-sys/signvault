@@ -79,3 +79,38 @@ export const rejectDocument = async (req, res) => {
     res.status(500).json({ message: err.message })
   }
 }
+import { generateSignedPDF } from '../services/pdfService.js'
+
+// POST /api/signatures/finalize — generate signed PDF
+export const finalizePDF = async (req, res) => {
+  try {
+    const { docId } = req.body
+
+    // Get document (verify ownership)
+    const doc = await Document.findOne({ _id: docId, owner: req.userId })
+    if (!doc) return res.status(404).json({ message: 'Document not found' })
+
+    // Get all signatures for this document
+    const signatures = await Signature.find({ documentId: docId })
+    if (signatures.length === 0) {
+      return res.status(400).json({ message: 'No signature fields found on this document' })
+    }
+
+    // Generate the signed PDF
+    const signedUrl = await generateSignedPDF(doc, signatures)
+
+    // Save the signed URL and mark as signed
+    await Document.findByIdAndUpdate(docId, {
+      signedFileUrl: signedUrl,
+      status: 'signed'
+    })
+
+    res.json({
+      message: 'Signed PDF generated successfully',
+      signedFileUrl: signedUrl
+    })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ message: err.message })
+  }
+}

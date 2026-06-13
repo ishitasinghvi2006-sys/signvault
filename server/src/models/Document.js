@@ -30,6 +30,10 @@ const documentSchema = new mongoose.Schema({
   signerEmail: {
     type: String,
     default: ''
+  },
+  signedFileUrl: {
+    type: String,
+    default: ''
   }
 }, { timestamps: true })
 

@@ -4,7 +4,8 @@ import {
   createSignature,
   getSignatures,
   signDocument,
-  rejectDocument
+  rejectDocument,
+  finalizePDF
 } from '../controllers/signatureController.js'
 
 const router = express.Router()
@@ -12,6 +13,7 @@ const router = express.Router()
 router.post('/', authMiddleware, createSignature)
 router.get('/:docId', getSignatures)              // public — signer can view
 router.patch('/:id/sign', signDocument)             // public — signer signs
-router.patch('/:id/reject', rejectDocument)         // public — signer rejects
+router.patch('/:id/reject', rejectDocument)  
+router.post('/finalize', authMiddleware, finalizePDF)       // public — signer rejects
 
 export default router
