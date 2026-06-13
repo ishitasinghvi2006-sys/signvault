@@ -1,73 +1,71 @@
-# React + TypeScript + Vite
+# SignVault — Document Signature Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-stack DocuSign-style web application for uploading, sharing
+and digitally signing PDF documents with audit trails.
 
-Currently, two official plugins are available:
+## 🚀 Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+| Layer     | Tech                                      |
+|-----------|-------------------------------------------|
+| Frontend  | React + Vite + TypeScript + Tailwind CSS  |
+| Backend   | Node.js + Express + MongoDB (Mongoose)    |
+| Storage   | Supabase Storage (PDFs)                   |
+| Auth      | JWT + bcrypt                              |
+| PDF       | react-pdf (viewer) · pdf-lib (generation) |
 
-## React Compiler
+## ✅ Features Built (Week 1)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- [x] JWT authentication (register, login, protected routes)
+- [x] PDF upload to Supabase Storage
+- [x] Document list dashboard with status filters
+- [x] Signature field placement on PDF (click to place)
+- [x] Drag-and-drop signature field repositioning
+- [x] Signature status tracking (pending/signed/rejected)
+- [x] Audit trail logging
 
-## Expanding the ESLint configuration
+## 🔜 Coming (Week 2)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- [ ] Generate signed PDF with embedded signatures (pdf-lib)
+- [ ] Email signing links with tokenized URLs
+- [ ] Public signing page for external signers
+- [ ] Full audit trail UI
+- [ ] Deployment (Vercel + Render + MongoDB Atlas)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🛠️ Local Setup
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+```bash
+# Clone
+git clone https://github.com/ishitasinghvi2006-sys/signvault.git
+cd signvault
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Backend
+cd server
+npm install
+# Create .env with PORT, MONGO_URI, JWT_SECRET, SUPABASE_URL, SUPABASE_ANON_KEY
+npm run dev
+
+# Frontend (new terminal)
+cd client
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Open `http://localhost:5173`
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 📁 Project Structure
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+signvault/
+├── client/          # React frontend
+│   └── src/
+│       ├── api/     # Axios instance
+│       ├── context/ # AuthContext
+│       ├── pages/   # Login, Register, Dashboard, Upload, DocViewer
+│       └── components/ # SignatureField
+└── server/          # Express backend
+    └── src/
+        ├── models/      # User, Document, Signature
+        ├── controllers/ # auth, doc, signature
+        ├── routes/      # /api/auth /api/docs /api/signatures
+        └── middleware/  # JWT auth
 ```

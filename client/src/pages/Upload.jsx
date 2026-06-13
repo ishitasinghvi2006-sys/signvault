@@ -11,25 +11,33 @@ export default function Upload() {
   const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (!file) return setError('Please select a PDF file')
-    setLoading(true)
-    setError('')
-    try {
-      const formData = new FormData()
-      formData.append('title', title)
-      formData.append('signerEmail', signerEmail)
-      formData.append('file', file)
-      await api.post('/docs/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      })
-      navigate('/dashboard')
-    } catch (err) {
-      setError(err.response?.data?.message || 'Upload failed')
-    } finally {
-      setLoading(false)
-    }
+  e.preventDefault()
+  setError('')
+
+  // Validation
+  if (!title.trim()) return setError('Document title is required')
+  if (title.trim().length < 3) return setError('Title must be at least 3 characters')
+  if (!file) return setError('Please select a PDF file')
+  if (file.type !== 'application/pdf') return setError('Only PDF files are allowed')
+  if (file.size > 50 * 1024 * 1024) return setError('File size must be less than 50MB')
+  if (signerEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signerEmail)) {
+    return setError('Please enter a valid signer email')
   }
+
+  setLoading(true)
+  try {
+    const formData = new FormData()
+    formData.append('title', title.trim())
+    formData.append('signerEmail', signerEmail)
+    formData.append('file', file)
+    await api.post('/docs/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    navigate('/dashboard')
+  } catch (err) {
+    setError(err.response?.data?.message || 'Upload failed. Check your connection.')
+  } finally { setLoading(false) }
+}
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">

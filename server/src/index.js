@@ -26,6 +26,23 @@ app.use('/api/auth', authRoutes)
 app.use('/api/docs', docRoutes)
 app.use('/api/signatures', signatureRoutes)
 
+// Global error handler — catches any unhandled errors
+app.use((err, req, res, next) => {
+  console.error('Error:', err.message)
+  if (err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(400).json({ message: 'File too large. Max 50MB.' })
+  }
+  if (err.message === 'Only PDF files allowed') {
+    return res.status(400).json({ message: err.message })
+  }
+  res.status(500).json({ message: 'Internal server error' })
+})
+
+// 404 handler — unknown routes
+app.use((req, res) => {
+  res.status(404).json({ message: `Route ${req.method} ${req.path} not found` })
+})
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'SignVault API running' })
