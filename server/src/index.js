@@ -5,7 +5,7 @@ import dotenv from 'dotenv'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import docRoutes from './routes/docs.js'
-
+import signatureRoutes from './routes/signatures.js'
 import authRoutes from './routes/auth.js'
 
 
@@ -24,6 +24,7 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')))
 
 app.use('/api/auth', authRoutes)
 app.use('/api/docs', docRoutes)
+app.use('/api/signatures', signatureRoutes)
 
 // Health check
 app.get('/api/health', (req, res) => {

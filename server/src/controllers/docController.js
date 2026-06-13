@@ -19,7 +19,7 @@ export const uploadDoc = async (req, res) => {
         contentType: 'application/pdf',
         upsert: false
       })
-
+        console.log('Supabase result:', { data, error })
     if (error) {
       return res.status(500).json({ message: 'Supabase upload failed', error: error.message })
     }
