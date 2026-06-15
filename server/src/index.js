@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url'
 import docRoutes from './routes/docs.js'
 import signatureRoutes from './routes/signatures.js'
 import authRoutes from './routes/auth.js'
+import signingRoutes from './routes/signing.js'
 
 
 dotenv.config()
@@ -25,6 +26,7 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')))
 app.use('/api/auth', authRoutes)
 app.use('/api/docs', docRoutes)
 app.use('/api/signatures', signatureRoutes)
+app.use('/api/signing', signingRoutes)
 
 // Global error handler — catches any unhandled errors
 app.use((err, req, res, next) => {

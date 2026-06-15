@@ -3,7 +3,7 @@ import supabase from '../supabase.js'
 
 export async function generateSignedPDF(document, signatures) {
   try {
-    // 1. Fetch the original PDF bytes from Supabase
+    // 1. Fetch original PDF bytes from Supabase URL
     const response = await fetch(document.fileUrl)
     if (!response.ok) throw new Error('Failed to fetch original PDF')
     const existingPdfBytes = await response.arrayBuffer()
@@ -16,8 +16,6 @@ export async function generateSignedPDF(document, signatures) {
 
     // 3. Embed each signature onto its page
     for (const sig of signatures) {
-      if (sig.status !== 'signed') continue
-
       const pageIndex = (sig.page || 1) - 1
       const page = pages[pageIndex] || pages[0]
       const { width, height } = page.getSize()
@@ -26,42 +24,33 @@ export async function generateSignedPDF(document, signatures) {
       const xPos = (sig.x / 100) * width
       const yPos = height - (sig.y / 100) * height - 30
 
-      // Draw signature box background
+      // Draw signature box
       page.drawRectangle({
-        x: xPos - 4,
-        y: yPos - 8,
-        width: 220,
-        height: 48,
+        x: xPos - 4, y: yPos - 8,
+        width: 220, height: 48,
         borderColor: rgb(0.2, 0.6, 0.3),
         borderWidth: 1.5,
         color: rgb(0.94, 0.99, 0.95),
       })
 
-      // Draw signer name (italic, looks like a signature)
+      // Draw signer name italic
       page.drawText(sig.signerEmail.split('@')[0], {
-        x: xPos + 4,
-        y: yPos + 18,
-        size: 18,
-        font: italicFont,
+        x: xPos + 4, y: yPos + 18,
+        size: 18, font: italicFont,
         color: rgb(0.05, 0.35, 0.15),
       })
 
-      // Draw metadata line below
+      // Draw metadata
       const signedDate = sig.signedAt
-        ? new Date(sig.signedAt).toLocaleDateString('en-GB', {
-            day: 'numeric', month: 'short', year: 'numeric'
-          })
-        : new Date().toLocaleDateString()
+        ? new Date(sig.signedAt).toLocaleDateString('en-GB')
+        : new Date().toLocaleDateString('en-GB')
 
-      page.drawText(`Signed by: ${sig.signerEmail} · ${signedDate}`, {
-        x: xPos + 4,
-        y: yPos + 4,
-        size: 7,
-        font,
+      page.drawText(`Signed: ${sig.signerEmail} · ${signedDate}`, {
+        x: xPos + 4, y: yPos + 4,
+        size: 7, font,
         color: rgb(0.3, 0.3, 0.3),
       })
 
-      // Draw a line under the signature
       page.drawLine({
         start: { x: xPos, y: yPos + 14 },
         end:   { x: xPos + 212, y: yPos + 14 },
@@ -70,14 +59,12 @@ export async function generateSignedPDF(document, signatures) {
       })
     }
 
-    // 4. Add a "DIGITALLY SIGNED" watermark on last page
+    // 4. Add footer watermark on last page
     const lastPage = pages[pages.length - 1]
-    const { width: lw, height: lh } = lastPage.getSize()
+    const { width: lw } = lastPage.getSize()
     lastPage.drawText('DIGITALLY SIGNED — SignVault', {
-      x: lw / 2 - 100,
-      y: 20,
-      size: 8,
-      font,
+      x: lw / 2 - 90, y: 20,
+      size: 8, font,
       color: rgb(0.6, 0.6, 0.6),
     })
 
@@ -93,9 +80,9 @@ export async function generateSignedPDF(document, signatures) {
         upsert: true
       })
 
-    if (uploadError) throw new Error(`Supabase upload failed: ${uploadError.message}`)
+    if (uploadError) throw new Error(`Upload failed: ${uploadError.message}`)
 
-    // 7. Get public URL
+    // 7. Return public URL
     const { data: urlData } = supabase.storage
       .from('documents')
       .getPublicUrl(signedFileName)

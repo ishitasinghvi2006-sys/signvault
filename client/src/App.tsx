@@ -7,6 +7,7 @@ import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import Upload from './pages/Upload'
 import DocViewer from './pages/DocViewer'
+import SignPage from './pages/SignPage'
 
 function PrivateRoute({ children }) {
   const { token } = useAuth()
@@ -27,6 +28,7 @@ function AppRoutes() {
       <Route path="/docs/:id" element={
         <PrivateRoute><DocViewer /></PrivateRoute>
       } />
+      <Route path="/sign/:token" element={<SignPage />} />
     </Routes>
   )
 }
