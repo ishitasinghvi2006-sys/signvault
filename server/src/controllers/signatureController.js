@@ -1,5 +1,7 @@
 import Signature from '../models/Signature.js'
 import Document from '../models/Document.js'
+import { logAction } from '../services/auditService.js'  // add at top
+
 
 // POST /api/signatures — save signature position
 export const createSignature = async (req, res) => {
