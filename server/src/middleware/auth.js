@@ -1,10 +1,22 @@
-import express from 'express'
-import authMiddleware from '../middleware/auth.js'
-import { getAuditTrail } from '../services/auditService.js'
+import jwt from 'jsonwebtoken'
 
-const router = express.Router()
+const authMiddleware = (req, res, next) => {
+  const authHeader = req.headers.authorization
 
-// GET /api/audit/:docId — get audit trail for a document
-router.get('/:docId', authMiddleware, getAuditTrail)
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'No token provided' })
+  }
 
-export default router
+  const token = authHeader.split(' ')[1]
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    req.userId = decoded.id
+    req.userEmail = decoded.email
+    next()
+  } catch (err) {
+    res.status(401).json({ message: 'Invalid or expired token' })
+  }
+}
+
+export default authMiddleware
