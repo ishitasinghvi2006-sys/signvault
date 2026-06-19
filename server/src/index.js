@@ -1,3 +1,7 @@
+import dns from 'dns'
+dns.setServers(['8.8.8.8', '8.8.4.4'])
+dns.setDefaultResultOrder('ipv4first')
+
 import express from 'express'
 import mongoose from 'mongoose'
 import cors from 'cors'
