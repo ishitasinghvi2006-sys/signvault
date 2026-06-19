@@ -3,7 +3,8 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
 
-const BASE = 'http://localhost:5000/api'
+const BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+
 
 export default function SignPage() {
   const { token } = useParams()

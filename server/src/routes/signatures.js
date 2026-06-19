@@ -10,10 +10,10 @@ import {
 
 const router = express.Router()
 
-router.post('/', authMiddleware, createSignature)
-router.get('/:docId', getSignatures)              // public — signer can view
-router.patch('/:id/sign', signDocument)             // public — signer signs
-router.patch('/:id/reject', rejectDocument)  
-router.post('/finalize', authMiddleware, finalizePDF)       // public — signer rejects
+router.post('/', authMiddleware, createSignature)           // place field
+router.get('/:docId', authMiddleware, getSignatures)        // get fields for doc
+router.patch('/:id/sign', signDocument)                     // signer accepts (no auth — uses token flow)
+router.patch('/:id/reject', rejectDocument)                 // signer rejects
+router.post('/finalize', authMiddleware, finalizePDF)       // generate signed PDF
 
 export default router

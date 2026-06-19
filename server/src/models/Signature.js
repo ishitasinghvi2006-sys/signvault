@@ -26,4 +26,4 @@ const signatureSchema = new mongoose.Schema({
   signatureData: { type: String, default: '' }
 }, { timestamps: true })
 
-export default mongoose.model('Signature', signatureSchema)
+export default mongoose.model('Signature', signatureSchema);

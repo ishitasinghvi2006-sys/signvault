@@ -4,13 +4,12 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import path from 'path'
 import { fileURLToPath } from 'url'
+
 import docRoutes from './routes/docs.js'
 import signatureRoutes from './routes/signatures.js'
 import authRoutes from './routes/auth.js'
 import signingRoutes from './routes/signing.js'
 import auditRoutes from './routes/audit.js'
-
-
 
 dotenv.config()
 
@@ -24,42 +23,36 @@ app.use(express.json())
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')))
 
 // Routes
-
 app.use('/api/auth', authRoutes)
 app.use('/api/docs', docRoutes)
 app.use('/api/signatures', signatureRoutes)
 app.use('/api/signing', signingRoutes)
 app.use('/api/audit', auditRoutes)
 
-
-// Global error handler — catches any unhandled errors
-app.use((err, req, res, next) => {
-  console.error('Error:', err.message)
-  if (err.code === 'LIMIT_FILE_SIZE') {
-    return res.status(400).json({ message: 'File too large. Max 50MB.' })
-  }
-  if (err.message === 'Only PDF files allowed') {
-    return res.status(400).json({ message: err.message })
-  }
-  res.status(500).json({ message: 'Internal server error' })
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', message: 'SignVault API running' })
 })
 
-// 404 handler — unknown routes
+// 404 handler
 app.use((req, res) => {
   res.status(404).json({ message: `Route ${req.method} ${req.path} not found` })
 })
 
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'SignVault API running' })
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('Error:', err.message)
+  if (err.code === 'LIMIT_FILE_SIZE') return res.status(400).json({ message: 'File too large. Max 50MB.' })
+  if (err.message === 'Only PDF files allowed') return res.status(400).json({ message: err.message })
+  res.status(500).json({ message: 'Internal server error' })
 })
 
 // Connect MongoDB then start server
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('✅ MongoDB connected')
-    app.listen(process.env.PORT, () => {
-      console.log(`🚀 Server on port ${process.env.PORT}`)
+    app.listen(process.env.PORT || 5000, () => {
+      console.log(`🚀 Server on port ${process.env.PORT || 5000}`)
     })
   })
   .catch((err) => console.error('MongoDB error:', err))
